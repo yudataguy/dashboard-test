@@ -4,6 +4,12 @@ const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
+// Instance Internal
+const Query = React.lazy(() => import('./views/query/submit/Submit'))
+const Prompt = React.lazy(() => import('./views/prompts/Prompts'))
+const Users = React.lazy(() => import('./views/users/Users'))
+const History = React.lazy(() => import('./views/query/history/History'))
+
 // Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
 const Breadcrumbs = React.lazy(() => import('./views/base/breadcrumbs/Breadcrumbs'))
@@ -95,6 +101,10 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
+  { path: '/query/submit', name: 'Query', element: Query },
+  { path: '/query/history', name: 'History', element: History },
+  { path: '/users', name: 'Users', element: Users },
+  { path: '/prompts', name: 'Prompts', element: Prompt },
 ]
 
 export default routes
