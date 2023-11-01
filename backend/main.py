@@ -1,14 +1,32 @@
+import json
+import logging
 import subprocess
 from typing import Any
-import json
+
 import openai
+from elasticsearch import Elasticsearch
 from fastapi import Body, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from fastapi.middleware.cors import CORSMiddleware
-import logging
 
 openai.api_key = "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"
+
+es_client = Elasticsearch([{"host": "localhost", "port": 9200, "scheme": "http"}])
+
+
+def pretty_response(response):
+    """Make elasticsearch response pretty"""
+    for hit in response["hits"]["hits"]:
+        search_id = hit["_id"]
+        score = hit["_score"]
+        title = hit["_source"]["title"]
+        text = hit["_source"]["text"]
+        pretty_output = (
+            f"\nID: {search_id}\nTitle: {title}\nSummary: {text}\nScore: {score}"
+        )
+        print(pretty_output)
+
 
 # Initialize FastAPI and MongoDB Client
 app = FastAPI(root_path="/api")
@@ -32,18 +50,57 @@ prompt_engineering = db["prompt_engineering"]
 test_history = db["test_history"]
 
 
-@app.post("/user_queries")
-async def create_user_query(query: str = Body(...)):
-    new_entry = {"query": query}
-    user_queries.insert_one(new_entry)
-    return {"message": "User query added", "query": query}
+@app.get("/user_queries_list")
+def get_saved_user_queries(page: int = 1, limit: int = 10):
+    """retrieve saved user queries for analysis"""
+
+    user_query_list = []
+    total_queries = user_queries.count_documents({})
+
+    for query in user_queries.find().skip((page - 1) * limit).limit(limit):
+        user_query_list.append(query)
+
+    return {
+        "success": True,
+        "data": user_query_list,
+        "total_queries": total_queries,
+        "current_page": page,
+        "total_pages": (total_queries // limit) + 1,
+    }
 
 
 @app.post("/test_query")
-async def create_test_query(query: Any = Body(...)):
-    new_entry = {"query": query}
-    test_query.insert_one(new_entry)
-    return {"message": "Test query added", "query": query}
+async def retrieval_part_result(req: Request):
+    """Test retrieval part of the pipeline"""
+
+    req = await req.json()
+
+    query = req.get("query")
+
+    # print(query)
+
+    result = es_client.search(
+        index="edi",
+        body={
+            "size": 10,
+            "_source": {"includes": ["element_ja", "value", "value_full_ja"]},
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "multi_match": {
+                                "query": query,
+                                "fields": ["element_ja.ngram^1"],
+                                "type": "phrase",
+                            }
+                        }
+                    ]
+                }
+            },
+        },
+    )
+
+    return {"success": True, "result": result}
 
 
 @app.post("/prompt_engineering")
@@ -52,6 +109,32 @@ async def create_prompt(req: Request):
 
     systemPrompt = req_body["systemPrompt"]
     query = req_body["query"]
+
+    context_results = es_client.search(
+        index="edi",
+        body={
+            "size": 10,
+            "_source": {"includes": ["element_ja", "value", "value_full_ja"]},
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "multi_match": {
+                                "query": query,
+                                "fields": ["element_ja.ngram^1"],
+                                "type": "phrase",
+                            }
+                        }
+                    ]
+                }
+            },
+        },
+    )
+
+    context = context_results.get("hits").get("hits")
+    paragraph = " ".join([hit["_source"]["value_full_ja"] for hit in context])
+
+    query = f"コンテクスト: {paragraph}\n質問: {query}\n回答:"
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",

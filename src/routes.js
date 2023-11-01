@@ -5,7 +5,7 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
 // Instance Internal
-const Query = React.lazy(() => import('./views/query/submit/Submit'))
+const Query = React.lazy(() => import('./views/query/test/Test'))
 const Prompt = React.lazy(() => import('./views/prompts/Prompts'))
 const Users = React.lazy(() => import('./views/users/Users'))
 const History = React.lazy(() => import('./views/query/history/History'))

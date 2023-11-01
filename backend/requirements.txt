@@ -2,3 +2,5 @@ fastapi  # Replace with the latest version
 uvicorn  # Replace with the latest version
 pymongo  # Replace with the latest version
 openai
+pydantic
+elasticsearch

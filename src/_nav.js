@@ -41,7 +41,7 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'Query',
+    name: 'Retrieval',
   },
   {
     component: CNavItem,
