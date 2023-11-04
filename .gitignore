@@ -10,6 +10,7 @@ yarn.lock
 
 # production
 /build
+/nginx/build
 
 # misc
 .eslintcache
@@ -26,3 +27,5 @@ yarn-error.log*
 
 .venv
 __pycache__
+
+.mypy_cache

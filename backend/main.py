@@ -1,5 +1,8 @@
+"""Fastapi backend server for the internal dashboard"""
+
 import json
 import logging
+import os
 import subprocess
 from typing import Any
 
@@ -7,40 +10,41 @@ import openai
 from elasticsearch import Elasticsearch
 from fastapi import Body, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles  # import StaticFiles
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
 openai.api_key = "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"
 
-es_client = Elasticsearch([{"host": "localhost", "port": 9200, "scheme": "http"}])
 
-
-def pretty_response(response):
-    """Make elasticsearch response pretty"""
-    for hit in response["hits"]["hits"]:
-        search_id = hit["_id"]
-        score = hit["_score"]
-        title = hit["_source"]["title"]
-        text = hit["_source"]["text"]
-        pretty_output = (
-            f"\nID: {search_id}\nTitle: {title}\nSummary: {text}\nScore: {score}"
-        )
-        print(pretty_output)
-
-
-# Initialize FastAPI and MongoDB Client
+# Initialize FastAPI and MongoDB + ElasticSearch Client
 app = FastAPI(root_path="/api")
 
 # Set up CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["http://localhost:3000"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
-client = MongoClient("mongodb://root:bunsho@localhost:27017/")
+# Serve static files
+# app.mount("/", StaticFiles(directory="build", html=True), name="static")
+
+
+if os.environ.get("RUNNING_IN_CONTAINER"):
+    print("running in container!!")
+    elastic_host = "elasticsearch"
+    mongodb_url = "mongodb://sammyuser:bunsho2023ai@mongodb:27017/"
+else:
+    elastic_host = "localhost"
+    mongodb_url = "mongodb://root:bunsho@localhost:27017/"
+
+es_client = Elasticsearch([{"host": elastic_host, "port": 9200, "scheme": "http"}])
+
+client = MongoClient(mongodb_url)
 db = client["internal_dashboard"]
 
 # Collections
@@ -48,6 +52,16 @@ user_queries = db["user_queries"]
 test_query = db["test_query"]
 prompt_engineering = db["prompt_engineering"]
 test_history = db["test_history"]
+
+
+# @app.get("/")
+# async def root():
+#     return FileResponse("build/index.html")
+
+
+@app.get("/user_queries_list")
+async def user_queries_list():
+    return {"message": "User queries list endpoint"}
 
 
 @app.get("/user_queries_list")

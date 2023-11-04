@@ -35,13 +35,15 @@ const ChecksRadios = () => {
     },
   ]
 
+  const baseUrl = '/api'
+
   const [result, setResult] = useState(null)
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://localhost:8000/test_query', {
+      const response = await fetch(`${baseUrl}/test_query`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify({
@@ -66,7 +68,7 @@ const ChecksRadios = () => {
         score: item._score,
       }))
 
-      console.log(newList)
+      // console.log(newList)
 
       setResult(newList)
       setSubmittedQuery(query)

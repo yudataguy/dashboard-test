@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: my-nginx-image
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/build:/usr/share/nginx/html
+    networks:
+      - backend
+
+  backend:
+    build: ./backend
+    expose:
+      - "8000"
+    # ports:
+    #   - "8000:8000"
+    depends_on:
+      - elasticsearch
+      - mongodb
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - MONGODB_URL=mongodb://mongodb:27017/
+      - RUNNING_IN_CONTAINER=true
+    networks:
+      - backend
+
+  elasticsearch:
+    build: ./elasticsearch_container
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:4.4.8
+    volumes:
+      - mongodb-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=sammyuser
+      - MONGO_INITDB_ROOT_PASSWORD=bunsho2023ai
+    networks:
+      - backend
+
+volumes:
+  mongodb-data:
+  elasticsearch-data:
+
+networks:
+  backend:

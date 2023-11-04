@@ -30,6 +30,8 @@ const PromptEngineering = () => {
     },
   ]
 
+  const baseUrl = '/api'
+
   const [result, setResult] = useState(null)
   const [systemPrompt, setSystemPrompt] = useState('')
   const [query, setQuery] = useState('')
@@ -37,7 +39,7 @@ const PromptEngineering = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://localhost:8000/prompt_engineering', {
+      const response = await fetch(`${baseUrl}/prompt_engineering`, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify({

@@ -1,0 +1,1 @@
+"""Ingest data into elasticsearch"""
