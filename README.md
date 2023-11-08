@@ -17,20 +17,41 @@
 
 CoreUI is meant to be the UX game changer. Pure & transparent code is devoid of redundant components, so the app is light enough to offer ultimate user experience. This means mobile devices also, where the navigation is just as easy and intuitive as on a desktop or laptop. The CoreUI Layout API lets you customize your project for almost any device – be it Mobile, Web or WebApp – CoreUI covers them all!
 
+## DEMO
+
+[Demo](http://bunsho.co) This is the link for internal dashboard (under construction).
+
+Steps:
+
+* in terminal, `export OPENAI_API_KEY=sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+* make sure `.env` exists in the root directory
+* run `docker-compose up -d` or `docker-compose up --build -d` if you want to rebuild the image first
+* run `docker-compose logs container_name` to check the logs
+* open browser, visit `http://localhost` or domain to visit the dashboard
+
 ## Table of Contents
 
-* [Versions](#versions)
-* [CoreUI Pro](#coreui-pro)
-* [Quick Start](#quick-start)
-* [Installation](#installation)
-* [Basic usage](#basic-usage)
-* [What's included](#whats-included)
-* [Documentation](#documentation)
-* [Versioning](#versioning)
-* [Creators](#creators)
-* [Community](#community)
-* [Support CoreUI Development](#support-coreui-development)
-* [Copyright and License](#copyright-and-license)
+- [CoreUI Free React Admin Template](#coreui-free-react-admin-template)
+  - [DEMO](#demo)
+  - [Table of Contents](#table-of-contents)
+  - [Versions](#versions)
+  - [CoreUI Pro](#coreui-pro)
+  - [Quick Start](#quick-start)
+    - [Installation](#installation)
+    - [Basic usage](#basic-usage)
+      - [Build](#build)
+  - [What's included](#whats-included)
+  - [Documentation](#documentation)
+  - [Versioning](#versioning)
+  - [Creators](#creators)
+  - [Community](#community)
+  - [Support CoreUI Development](#support-coreui-development)
+    - [Platinum Sponsors](#platinum-sponsors)
+    - [Gold Sponsors](#gold-sponsors)
+    - [Silver Sponsors](#silver-sponsors)
+    - [Bronze Sponsors](#bronze-sponsors)
+    - [Backers](#backers)
+  - [Copyright and License](#copyright-and-license)
 
 ## Versions
 
@@ -192,4 +213,3 @@ copyright 2023 creativeLabs Łukasz Holeczek.
  
 Code released under [the MIT license](https://github.com/coreui/coreui-free-react-admin-template/blob/master/LICENSE).
 There is only one limitation you can't can’t re-distribute the CoreUI as stock. You can’t do this if you modify the CoreUI. In past we faced some problems with persons who tried to sell CoreUI based templates.
-

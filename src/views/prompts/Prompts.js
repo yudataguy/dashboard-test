@@ -9,6 +9,7 @@ import {
   CFormTextarea,
   CButton,
   CTable,
+  CSpinner,
 } from '@coreui/react'
 
 const PromptEngineering = () => {
@@ -36,8 +37,10 @@ const PromptEngineering = () => {
   const [systemPrompt, setSystemPrompt] = useState('')
   const [query, setQuery] = useState('')
   const [history, setHistory] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
+    setLoading(true)
     try {
       const response = await fetch(`${baseUrl}/prompt_engineering`, {
         method: 'POST',
@@ -60,6 +63,7 @@ const PromptEngineering = () => {
     } catch (error) {
       console.error('Fetch Error:', error)
     }
+    setLoading(false)
   }
 
   return (
@@ -91,24 +95,30 @@ const PromptEngineering = () => {
                   onChange={(e) => setQuery(e.target.value)}
                 ></CFormTextarea>
               </div>
-              <div className="mb-3 button-group spaced-buttons flex justify-between">
-                <CButton
-                  component="input"
-                  type="button"
-                  color="primary"
-                  value="Submit"
-                  onClick={handleSubmit}
-                  className="mr-4"
-                  style={{ marginRight: '12px' }}
-                />
-                <CButton
-                  component="input"
-                  type="button"
-                  color="warning"
-                  value="Set as Default"
-                  disabled
-                />
-              </div>
+              {loading ? (
+                <CButton disabled>
+                  <CSpinner component="span" size="sm" aria-hidden="true" /> Loading...
+                </CButton>
+              ) : (
+                <div className="mb-3 button-group spaced-buttons flex justify-between">
+                  <CButton
+                    component="input"
+                    type="button"
+                    color="primary"
+                    value="Submit"
+                    onClick={handleSubmit}
+                    className="mr-4"
+                    style={{ marginRight: '12px' }}
+                  />
+                  <CButton
+                    component="input"
+                    type="button"
+                    color="warning"
+                    value="Set as Default"
+                    disabled
+                  />
+                </div>
+              )}
             </CForm>
           </CCardBody>
         </CCard>

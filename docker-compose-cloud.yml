@@ -12,6 +12,8 @@ services:
       # - ./nginx/build:/usr/share/nginx/html
     networks:
       - backend
+    env_file:
+      - .env
 
   backend:
     image: dockerbouy/backend-1:latest
@@ -24,9 +26,10 @@ services:
       - elasticsearch
       - mongodb
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URL=mongodb://mongodb:27017/
-      - RUNNING_IN_CONTAINER=true
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RUNNING_IN_CONTINAER=true
+    env_file:
+      - .env
     networks:
       - backend
 
@@ -47,9 +50,8 @@ services:
     image: mongo:4.4.8
     volumes:
       - mongodb-data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=sammyuser
-      - MONGO_INITDB_ROOT_PASSWORD=bunsho2023ai
+    env_file:
+      - .env
     networks:
       - backend
 

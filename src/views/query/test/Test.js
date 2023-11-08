@@ -9,6 +9,7 @@ import {
   CFormTextarea,
   CButton,
   CTable,
+  CSpinner,
 } from '@coreui/react'
 
 const ChecksRadios = () => {
@@ -40,12 +41,14 @@ const ChecksRadios = () => {
   const [result, setResult] = useState(null)
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
+    setLoading(true)
     try {
       const response = await fetch(`${baseUrl}/test_query`, {
         method: 'POST',
-        mode: 'cors',
+        // mode: 'cors',
         body: JSON.stringify({
           query: query,
         }),
@@ -57,25 +60,19 @@ const ChecksRadios = () => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const data = await response.json()
-      const result = data['result']['hits']['hits']
+      const result = data['result']['list']
 
-      console.log(result)
+      // console.log(result)
+      const processedQuery = data['result']['query']
+      // console.log(processedQuery)
 
-      const newList = result.map((item) => ({
-        value: item._source.value,
-        column: item._source.element_ja,
-        full_value: item._source.value_full_ja,
-        score: item._score,
-      }))
-
-      // console.log(newList)
-
-      setResult(newList)
-      setSubmittedQuery(query)
+      setResult(result)
+      setSubmittedQuery(processedQuery)
       setQuery('')
     } catch (error) {
       console.error('Fetch Error:', error)
     }
+    setLoading(false)
   }
 
   return (
@@ -94,17 +91,23 @@ const ChecksRadios = () => {
                   onChange={(e) => setQuery(e.target.value)}
                 ></CFormTextarea>
               </div>
-              <div className="mb-3 button-group spaced-buttons flex justify-between">
-                <CButton
-                  component="input"
-                  type="button"
-                  color="primary"
-                  value="Submit"
-                  className="mr-4"
-                  onClick={handleSubmit}
-                  style={{ marginRight: '12px' }}
-                />
-              </div>
+              {loading ? (
+                <CButton disabled>
+                  <CSpinner component="span" size="sm" aria-hidden="true" /> Loading...
+                </CButton>
+              ) : (
+                <div className="mb-3 button-group spaced-buttons flex justify-between">
+                  <CButton
+                    component="input"
+                    type="button"
+                    color="primary"
+                    value="Submit"
+                    className="mr-4"
+                    onClick={handleSubmit}
+                    style={{ marginRight: '12px' }}
+                  />
+                </div>
+              )}
             </CForm>
           </CCardBody>
         </CCard>

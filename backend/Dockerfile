@@ -1,7 +1,7 @@
 # FILEPATH: /Users/samyu/Downloads/code/bunshoai/internal-dashboard/Dockerfile
 
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim-buster
+FROM python:3.10-slim-buster
 
 # Set the working directory to /app
 WORKDIR /app

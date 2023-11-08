@@ -4,12 +4,16 @@ services:
   frontend:
     image: my-nginx-image
     build: ./nginx
+    depends_on:
+      - backend
     ports:
       - "80:80"
     volumes:
       - ./nginx/build:/usr/share/nginx/html
     networks:
       - backend
+    env_file:
+      - .env
 
   backend:
     build: ./backend
@@ -21,9 +25,10 @@ services:
       - elasticsearch
       - mongodb
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URL=mongodb://mongodb:27017/
-      - RUNNING_IN_CONTAINER=true
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RUNNING_IN_CONTINAER=true
+    env_file:
+      - .env
     networks:
       - backend
 
@@ -43,11 +48,10 @@ services:
     image: mongo:4.4.8
     volumes:
       - mongodb-data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=sammyuser
-      - MONGO_INITDB_ROOT_PASSWORD=bunsho2023ai
     networks:
       - backend
+    env_file:
+      - .env
 
 volumes:
   mongodb-data:
