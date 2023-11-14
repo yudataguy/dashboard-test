@@ -5,7 +5,7 @@ FROM nginx:latest
 COPY ./build /usr/share/nginx/html
 
 # Copy the custom nginx.conf to the container
-COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 80
 EXPOSE 80
