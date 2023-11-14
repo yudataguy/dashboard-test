@@ -37,8 +37,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
       - name: Build Docker image - nginx
-        run: docker build -f ./nginx/Dockerfile -t dockerbouy/my-nginx-image:latest .
+        run: docker build -t dockerbouy/my-nginx-image:latest .
+        working-directory: ./nginx
         # Replace 'yourusername/yourappname' with your Docker Hub username and app name
+
+      - name: Build Docker image - backend
+        run: docker build -t dockerbouy/backend-1:latest .
+        working-directory: ./backend
+
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -46,5 +52,8 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Push Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub - nginx/frontend
         run: docker push dockerbouy/my-nginx-image:latest
+
+      - name: Push Docker image to Docker Hub - backend
+        run: docker push dockerbouy/backend-1:latest
