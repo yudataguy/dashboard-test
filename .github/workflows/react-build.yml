@@ -47,4 +47,4 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Push Docker image to Docker Hub
-        run: docker push dockerbouy/my-nginx-image:latest:latest
+        run: docker push dockerbouy/my-nginx-image:latest
