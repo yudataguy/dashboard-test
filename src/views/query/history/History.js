@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CCol,
-  CFormCheck,
-  CRow,
-  CForm,
-  CFormTextarea,
-  CTable,
-  CButton,
-} from '@coreui/react'
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CButton } from '@coreui/react'
 
 const QueryHistory = () => {
   const detailColumns = [

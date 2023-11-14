@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CCol,
-  CFormCheck,
-  CFormSwitch,
-  CRow,
-  CTable,
-  CButton,
-} from '@coreui/react'
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CButton } from '@coreui/react'
 
 const ChecksRadios = () => {
   const columns = [
