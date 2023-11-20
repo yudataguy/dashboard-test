@@ -3,6 +3,10 @@
 # Use an official Python runtime as a parent image
 FROM python:3.10-slim-buster
 
+# Setup AWS credentials
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
 # Set the working directory to /app
 WORKDIR /app
 
