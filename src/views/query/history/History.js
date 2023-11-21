@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CButton } from '@coreui/react'
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CTable } from '@coreui/react'
 
 const QueryHistory = () => {
   const detailColumns = [
@@ -33,13 +33,12 @@ const QueryHistory = () => {
   const baseUrl = '/api'
 
   const [result, setResult] = useState(null)
-  const [totalRows, setTotalRows] = useState(0)
-  const [page, setPage] = useState(1)
+  // const [page, setPage] = useState(1)
 
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const response = await fetch(`${baseUrl}/test_query_history?page=${page}`, {
+        const response = await fetch(`${baseUrl}/test_query_history`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json; charset=utf-8',
@@ -49,8 +48,7 @@ const QueryHistory = () => {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
         const data = await response.json()
-        const result = JSON.parse(decodeURIComponent(escape(data['result']))) // convert result to JSON object and ensure it's in UTF-8 format
-        setTotalRows(data['total'])
+        const result = data['result'] // convert result to JSON object and ensure it's in UTF-8 format
         console.log(result)
         setResult(result)
       } catch (error) {
@@ -59,7 +57,7 @@ const QueryHistory = () => {
     }
 
     loadHistory()
-  }, [page])
+  }, [])
 
   return (
     <CRow>
@@ -72,7 +70,7 @@ const QueryHistory = () => {
           <CCardBody>
             <CTable columns={detailColumns} items={result} hover striped bordered size="sm" />
           </CCardBody>
-          <div className="mb-3 button-group spaced-buttons flex justify-between">
+          {/* <div className="mb-3 button-group spaced-buttons flex justify-between">
             <CButton
               component="input"
               type="button"
@@ -92,7 +90,7 @@ const QueryHistory = () => {
               onClick={() => setPage(page === totalRows ? totalRows : page + 1)}
               disabled={page === totalRows}
             />
-          </div>
+          </div> */}
         </CCard>
       </CCol>
     </CRow>

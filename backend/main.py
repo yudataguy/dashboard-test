@@ -4,15 +4,17 @@ import json
 import logging
 import os
 import subprocess
+from datetime import datetime
+from decimal import Decimal
 
 import openai
-from bson.json_util import dumps
+from dynamodb_manager import DynamoDBManager
 from elasticsearch import Elasticsearch
 from fastapi import FastAPI, Request
 from magentic import FunctionCall, prompt
 from pydantic import BaseModel
-from pymongo import MongoClient
-from pymongo.errors import PyMongoError
+
+logging.basicConfig(level=logging.INFO)
 
 
 class ReturnObj(BaseModel):
@@ -38,53 +40,21 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # print("running in container!!")
 elastic_host = "elasticsearch"
 
-mongodb_host = os.getenv("MONGO_HOST", "mongodb")
-mongodb_port = os.getenv("MONGO_PORT", "27017")
-mongodb_user = os.getenv("MONGO_USER")
-mongodb_password = os.getenv("MONGO_PW")
-mongodb_db = os.getenv("MONGO_DB", "bunsho_co")
-mongodb_url = (
-    f"mongodb://{mongodb_user}:{mongodb_password}@{mongodb_host}:{mongodb_port}/"
-)
-
-print("MONGODB URL: ", mongodb_url)
-
-
 # Initialize FastAPI and MongoDB + ElasticSearch Client
 app = FastAPI(root_path="/api")
 
 es_client = Elasticsearch([{"host": elastic_host, "port": 9200, "scheme": "http"}])
 
-client: MongoClient = MongoClient(mongodb_url)
-
-db = client[mongodb_db]
-
-# Collections
-user_queries = db["user_queries"]
-test_query = db["test_query"]
-prompt_engineering = db["prompt_engineering"]
-test_history = db["test_history"]
+# DynamoDB tables
+prompt_engineering = DynamoDBManager(table_name="internal-dashboard-prompt-test")
+retrieval_test_history = DynamoDBManager(table_name="internal-table-query-history")
 
 
 @app.get("/user_queries_list")
-def get_saved_user_queries(page: int = 1, limit: int = 10):
+def get_saved_user_queries(limit: int = 100):
     """retrieve saved user queries for analysis"""
 
-    user_query_list = []
-    total_queries = user_queries.count_documents({})
-
-    for query in (
-        user_queries.find({}, {"_id": 0}).skip((page - 1) * limit).limit(limit)
-    ):
-        user_query_list.append(query)
-
-    return {
-        "success": True,
-        "data": user_query_list,
-        "total_queries": total_queries,
-        "current_page": page,
-        "total_pages": (total_queries // limit) + 1,
-    }
+    pass
 
 
 @app.post("/test_query")
@@ -140,15 +110,18 @@ async def retrieval_part_result(req: Request):
             "value": item["_source"]["value"],
             "column": item["_source"]["element_ja"],
             "full_value": item["_source"]["value_full_ja"],
-            "score": item["_score"],
+            "score": Decimal(str(item["_score"])),
             "query": str(query),
+            "timestamp": str(datetime.now()),
         }
         for item in result
     ]
 
+    print(formatted_list_with_query)
+
     try:
-        test_query.insert_many(formatted_list_with_query)
-    except PyMongoError as e:
+        retrieval_test_history.put_items(formatted_list_with_query)
+    except Exception as e:
         return {
             "success": False,
             "message": "An error occurred while adding the query",
@@ -159,25 +132,14 @@ async def retrieval_part_result(req: Request):
 
 
 @app.get("/test_query_history")
-async def get_test_history(page: int = 1, limit: int = 3):
+async def get_test_history(limit: int = 100):
     """Test history endpoint"""
-    skip = (page - 1) * limit
-    total = test_query.count_documents({})
-    result = test_query.find({}, {"_id": 0}).sort("_id", -1).skip(skip).limit(10)
 
-    result_list = list(result)
-    result_json = dumps(result_list)
-    result_utf8 = result_json.encode("utf-8")
+    res = retrieval_test_history.scan_table(page_size=limit)
 
-    print(result_utf8)
+    print(res)
 
-    return {
-        "success": True,
-        "total": total,
-        "page": page,
-        "limit": limit,
-        "result": result_utf8,
-    }
+    return {"success": True, "result": res}
 
 
 @app.post("/prompt_engineering")
@@ -241,13 +203,14 @@ async def create_prompt(req: Request):
         "prompt": systemPrompt,
         "query": query,
         "response": gpt_response,
+        "timestamp": str(datetime.now()),
     }
 
     logging.info("New entry: %s", new_entry)
 
     try:
-        prompt_engineering.insert_one(json.loads(json.dumps(new_entry)))
-    except PyMongoError as e:
+        prompt_engineering.put_item(json.loads(json.dumps(new_entry)))
+    except Exception as e:
         return {
             "success": False,
             "message": "An error occurred while adding the query",
