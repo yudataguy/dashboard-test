@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CButton } from '@coreui/react'
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CTable } from '@coreui/react'
 
 const QueryHistory = () => {
   const detailColumns = [
