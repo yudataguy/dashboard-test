@@ -50,25 +50,11 @@ prompt_engineering = DynamoDBManager(table_name="internal-dashboard-prompt-test"
 retrieval_test_history = DynamoDBManager(table_name="internal-table-query-history")
 
 
-# @app.get("/user_queries_list")
-# def get_saved_user_queries(page: int = 1, limit: int = 10):
-#     """retrieve saved user queries for analysis"""
+@app.get("/user_queries_list")
+def get_saved_user_queries(limit: int = 100):
+    """retrieve saved user queries for analysis"""
 
-#     user_query_list = []
-#     total_queries = user_queries.count_documents({})
-
-#     for query in (
-#         user_queries.find({}, {"_id": 0}).skip((page - 1) * limit).limit(limit)
-#     ):
-#         user_query_list.append(query)
-
-#     return {
-#         "success": True,
-#         "data": user_query_list,
-#         "total_queries": total_queries,
-#         "current_page": page,
-#         "total_pages": (total_queries // limit) + 1,
-#     }
+    pass
 
 
 @app.post("/test_query")

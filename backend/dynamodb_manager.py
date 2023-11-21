@@ -75,6 +75,7 @@ class DynamoDBManager:
         page_size: int = 100,
     ):
         """Retrieve the last 100 or desired items from the table"""
+        # TODO: pagination
 
         response = self.table.scan()
 
